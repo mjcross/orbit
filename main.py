@@ -39,25 +39,25 @@ def main():
         x_list.append(s.x)
         y_list.append(s.y)
 
-        # calculate p and q coefficients
+        # calculate Runge Kutta coefficients for displacement and velocity
         #
-        p1 = a(s)
-        q1 = v
+        ks_1 = a(s)
+        kv_1 = v
 
-        p2 = a(s + q1 * dt/2)
-        q2 = v + p1 * dt/2
+        ks_2 = a(s + kv_1 * dt/2)
+        kv_2 = v + ks_1 * dt/2
 
-        p3 = a(s + q2 * dt/2)
-        q3 = v + p2 * dt/2
+        ks_3 = a(s + kv_2 * dt/2)
+        kv_3 = v + ks_2 * dt/2
 
-        p4 = a(s + q3 * dt)
-        q4 = v + p3 * dt
+        ks_4 = a(s + kv_3 * dt)
+        kv_4 = v + ks_3 * dt
 
-        # update parameters
+        # predict new displacement and velocity
         #
         t += dt
-        v = v + (dt/6) * (p1 + 2 * p2 + 2 * p3 + p4)
-        s = s + (dt/6) * (q1 + 2 * q2 + 2 * q3 + q4)
+        v = v + (dt/6) * (ks_1 + 2 * ks_2 + 2 * ks_3 + ks_4)
+        s = s + (dt/6) * (kv_1 + 2 * kv_2 + 2 * kv_3 + kv_4)
     
     # display results
     #

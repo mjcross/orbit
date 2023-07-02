@@ -6,28 +6,29 @@ r_perihelion = 147100e6 # orbit radius of earth at perihelion (m)
 v_perihelion = 30.29e3  # average orbital velocity (m/s)
 
 v0 = Vec2(v_perihelion, 0)     # initial velocity vector
-y0 = Vec2(0, r_perihelion)     # initial position vector
+s0 = Vec2(0, r_perihelion)     # initial position vector
 
-h = 24 * 60 * 60        # 1 day
-t_max = 365 * h         # 1 year (approx)
+dt = 24 * 60 * 60       # 1 day
+t_max = 365 * dt         # 1 year (approx)
 
-def a(r):
-    """ acceleration at displacement r (vector) """
-    k = mu / pow(abs(r), 3)
-    a = Vec2( -k * r.x, -k * r.y)
+def a(s):
+    """ acceleration at displacement s (vector) """
+    k = mu / pow(abs(s), 3)
+    a = Vec2( -k * s.x, -k * s.y)
     return a
 
 
 def main():
     # initialisation
     #  
-    t = 0
-    v = v0
-    y = y0
+    t = 0               # initial time
+    v = v0              # initial velocity vector
+    s = s0              # initial displacement vector
 
-    t_list = []
-    pos_x = []
-    pos_y = []
+    # list of coordinates to be plotted
+    #
+    x_list = []
+    y_list = []
 
     # iterate solution
     #
@@ -35,34 +36,34 @@ def main():
 
         # record results
         #
-        pos_x.append(y.x)
-        pos_y.append(y.y)
+        x_list.append(s.x)
+        y_list.append(s.y)
 
         # calculate p and q coefficients
         #
-        p1 = a(y)
+        p1 = a(s)
         q1 = v
 
-        p2 = a(y + q1 * h/2)
-        q2 = v + p1 * h/2
+        p2 = a(s + q1 * dt/2)
+        q2 = v + p1 * dt/2
 
-        p3 = a(y + q2 * h/2)
-        q3 = v + p2 * h/2
+        p3 = a(s + q2 * dt/2)
+        q3 = v + p2 * dt/2
 
-        p4 = a(y + q3 * h)
-        q4 = v + p3 * h
+        p4 = a(s + q3 * dt)
+        q4 = v + p3 * dt
 
         # update parameters
         #
-        t += h
-        v = v + (h/6) * (p1 + 2 * p2 + 2 * p3 + p4)
-        y = y + (h/6) * (q1 + 2 * q2 + 2 * q3 + q4)
+        t += dt
+        v = v + (dt/6) * (p1 + 2 * p2 + 2 * p3 + p4)
+        s = s + (dt/6) * (q1 + 2 * q2 + 2 * q3 + q4)
     
     # display results
     #
     fig, ax = plt.subplots(1, 1)
     ax.set_title('Earth orbit (365 days)')
-    ax.plot(pos_x, pos_y, label='position')
+    ax.plot(x_list, y_list, label='position')
     ax.set_aspect('equal', 'box')
     ax.grid()
     plt.show()

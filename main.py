@@ -9,7 +9,7 @@ v0 = Vec2(v_perihelion, 0)     # initial velocity vector
 s0 = Vec2(0, r_perihelion)     # initial position vector
 
 dt = 24 * 60 * 60       # 1 day
-t_max = 365 * dt         # 1 year (approx)
+t_max = 365 * dt        # 1 year (approx)
 
 def a(s):
     """ acceleration at displacement s (vector) """
@@ -25,7 +25,7 @@ def main():
     v = v0              # initial velocity vector
     s = s0              # initial displacement vector
 
-    # list of coordinates to be plotted
+    # create list of coordinates to be plotted
     #
     x_list = []
     y_list = []

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from vec2 import Vec2
+from numList import NumList
 
 mu = 132712440042e9     # standard gravitational parameter of the sun (m3/s2)
 r_perihelion = 147100e6 # orbit radius of earth at perihelion (m)
@@ -19,6 +20,7 @@ def a(s):
 
 
 def main():
+
     # initialisation
     #  
     t = 0               # initial time

@@ -1,6 +1,7 @@
 from math import sqrt
 
 class Vec2:
+    """Class representing a 2D vector"""
 
     def __init__(self, x=0, y=0):
         self.x = x
@@ -14,12 +15,13 @@ class Vec2:
 
     def __mul__(self, other):
         return Vec2(other * self.x, other * self.y)
-
-    def __rmul__(self, other):
-        return Vec2(other * self.x, other * self.y)
+    
+    __rmul__ = __mul__
 
     def __truediv__(self, other):
         return Vec2(self.x / other, self.y / other)
     
     def __abs__(self):
+        """Return the magnitude of the vector"""
         return sqrt(pow(self.x, 2) + pow(self.y, 2))
+    

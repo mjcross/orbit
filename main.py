@@ -5,36 +5,28 @@ from itertools import combinations
 
 
 def a(s, mG):
-    """Calculate the acceleration of each planet in a system due to gravitational attraction.
-    s: position vectors
-    mG: masses times G
-    Returns: acceleration vectors"""
-   
+    """calculate the acceleration of each planet in a system"""   
     a = NumList(Vec2() for _ in s)      # initialise acceleration vectors to zero
-
-    # add up accelerations due to each pair of bodies
-    #
-    for i1, i2 in combinations(range(len(s)), 2):
-        s12 = s[i2] - s[i1]             # displacement s1 -> s2
-        f = s12 / pow(abs(s12), 3)      # 1/r^2 times the unit vector
-        a[i1] += f * mG[i2]             # acceleration of 1 due to 2 (a = f/m)
-        a[i2] -= f * mG[i1]             # acceleration of 2 due to 1
-
+    for (s1, mG1, a1), (s2, mG2, a2) in combinations(zip(s, mG, a), 2):
+        s12 = s2 - s1
+        f = s12 / pow(abs(s12), 3)      # 1/r^2 in the direction of s12
+        a1 += f * mG2                   # acceleration of 1 due to 2 (f = ma)
+        a2 -= f * mG1                   # acceleration of 2 due to 1
     return a
 
 
 def main():
+    """simulate the system and plot the results"""
 
     # ==================== initialisation ======================
     #
-    t = 0
     dt = 0.01
     t_max = 5
 
     # gravitational constant (currently unused)
     G = 6.67430e-11
 
-    # masses (normally these should be multiplied by G)
+    # masses (normally these would be multiplied by G)
     #
     mG = [
         1,
@@ -69,6 +61,7 @@ def main():
     # ======================== main loop =========================
     # iterate solution and gather data for graph
     #
+    t = 0
     while t <= t_max:
 
         # record results
@@ -77,7 +70,8 @@ def main():
             x_list.append(this_s.x)
             y_list.append(this_s.y)
 
-        # calculate RK coefficients for displacement and velocity
+        # calculate RK coefficients for displacement (ks_) and velocity (kv_)
+        # (note that all the variables here are lists of vectors)
         #
         ks_1 = a(s, mG)
         kv_1 = v
@@ -91,7 +85,7 @@ def main():
         ks_4 = a(s + kv_3 * dt, mG)
         kv_4 = v + ks_3 * dt
 
-        # predict new displacement and velocity
+        # predict new displacements and velocities
         #
         t += dt
         v = v + (dt/6) * (ks_1 + 2 * ks_2 + 2 * ks_3 + ks_4)

@@ -3,75 +3,79 @@ from vec2 import Vec2
 from numList import NumList
 from itertools import combinations
 
-dt = 0.01
-t_max = 5
-
-#G = 6.67430e-11
-G = 1
-
 
 def a(s, mG):
     """Calculate the acceleration of each planet in a system due to gravitational attraction.
     s: position vectors
-    mG: masses (times G)
+    mG: masses times G
     Returns: acceleration vectors"""
+   
+    a = NumList(Vec2() for _ in s)      # initialise acceleration vectors to zero
 
-    n = len(s)    
-    a = NumList(Vec2() for _ in range(n))       # initialise acceleration vectors to zero
-
-    # iterate over each pair of array indices
+    # add up accelerations due to each pair of bodies
     #
-    for i1, i2 in combinations(range(n), 2):
+    for i1, i2 in combinations(range(len(s)), 2):
         s12 = s[i2] - s[i1]             # displacement s1 -> s2
         f = s12 / pow(abs(s12), 3)      # 1/r^2 times the unit vector
-        a[i1] += f * mG[i2]             # update a1 due to m2 (a = f/m)
-        a[i2] -= f * mG[i1]             # update a2 due to m1
+        a[i1] += f * mG[i2]             # acceleration of 1 due to 2 (a = f/m)
+        a[i2] -= f * mG[i1]             # acceleration of 2 due to 1
 
-    return a
-
-
-def a_old(s):
-    """ acceleration at displacement s (vector) """
-    k = mu / pow(abs(s), 3)
-    a = Vec2( -k * s.x, -k * s.y)
     return a
 
 
 def main():
 
-    # initialisation
-    #  
-    t = 0               # initial time
-    mG = [
-        10 * G,
-        1 * G
-    ]
-    s = NumList([
-        Vec2(0, 0),
-        Vec2(1, 0)
-    ])
-    v = NumList([
-        Vec2(0, 0),
-        Vec2(0, 4)
-    ])
-
-    # coordinates to be plotted
+    # ==================== initialisation ======================
     #
-    x0 = []
-    y0 = []
-    x1 = []
-    y1 = []
+    t = 0
+    dt = 0.01
+    t_max = 5
 
-    # iterate solution
+    # gravitational constant (currently unused)
+    G = 6.67430e-11
+
+    # masses (normally these should be multiplied by G)
+    #
+    mG = [
+        1,
+        1,
+        1,
+        1 
+    ]
+
+    # initial positions
+    #
+    s = NumList([
+        Vec2( 0,  1),
+        Vec2( 1,  0),
+        Vec2( 0, -1),
+        Vec2(-1,  0)
+    ])
+
+    # initial velocities
+    #
+    v = NumList([
+        Vec2(-0.5,    0),
+        Vec2(   0,  0.5),
+        Vec2( 0.5,    0),
+        Vec2(   0, -0.5)
+    ])
+
+    # initialise lists of coordinates
+    #
+    x_coords = [[] for _ in s]
+    y_coords = [[] for _ in s]
+
+    # ======================== main loop =========================
+    # iterate solution and gather data for graph
     #
     while t <= t_max:
 
         # record results
         #
-        x0.append(s[0].x)
-        y0.append(s[0].y)
-        x1.append(s[1].x)
-        y1.append(s[1].y)
+        for this_s, x_list, y_list in zip(s, x_coords, y_coords):
+            x_list.append(this_s.x)
+            y_list.append(this_s.y)
 
         # calculate RK coefficients for displacement and velocity
         #
@@ -93,12 +97,12 @@ def main():
         v = v + (dt/6) * (ks_1 + 2 * ks_2 + 2 * ks_3 + ks_4)
         s = s + (dt/6) * (kv_1 + 2 * kv_2 + 2 * kv_3 + kv_4)
     
-    # display results
+    # ==================== display results ======================
     #
     fig, ax = plt.subplots(1, 1)
-    ax.set_title('Simulation')
-    ax.scatter(x0, y0, marker='.')
-    ax.scatter(x1, y1, marker='.')
+    ax.set_title('Orbit Simulation')
+    for x_list, y_list in zip(x_coords, y_coords):
+        ax.plot(x_list, y_list)
     ax.set_aspect('equal', 'box')
     ax.grid()
     plt.show()

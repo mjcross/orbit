@@ -6,17 +6,17 @@ class NumList(list):
 
     def __add__(self, other):
         try:
-            return map(add, self, other)
+            return NumList(map(add, self, other))
         except TypeError:
             # in case `other` is non-iterable
-            return map(add, self, repeat(other))
+            return NumList(map(add, self, repeat(other)))
 
     __radd__ = __add__
 
     def __mul__(self, other):
         try:
-            return map(mul, self, other)
+            return NumList(map(mul, self, other))
         except TypeError:
-            return map(mul, self, repeat(other))
+            return NumList(map(mul, self, repeat(other)))
 
     __rmul__ = __mul__

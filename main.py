@@ -1,18 +1,36 @@
 import matplotlib.pyplot as plt
 from vec2 import Vec2
 from numList import NumList
+from itertools import combinations
 
-mu = 132712440042e9     # standard gravitational parameter of the sun (m3/s2)
-r_perihelion = 147100e6 # orbit radius of earth at perihelion (m)
-v_perihelion = 30.29e3  # average orbital velocity (m/s)
+dt = 0.01
+t_max = 5
 
-v0 = Vec2(v_perihelion, 0)     # initial velocity vector
-s0 = Vec2(0, r_perihelion)     # initial position vector
+#G = 6.67430e-11
+G = 1
 
-dt = 24 * 60 * 60       # 1 day
-t_max = 365 * dt        # 1 year (approx)
 
-def a(s):
+def a(s, mG):
+    """Calculate the acceleration of each planet in a system due to gravitational attraction.
+    s: position vectors
+    mG: masses (times G)
+    Returns: acceleration vectors"""
+
+    n = len(s)    
+    a = NumList(Vec2() for _ in range(n))       # initialise acceleration vectors to zero
+
+    # iterate over each pair of array indices
+    #
+    for i1, i2 in combinations(range(n), 2):
+        s12 = s[i2] - s[i1]             # displacement s1 -> s2
+        f = s12 / pow(abs(s12), 3)      # 1/r^2 times the unit vector
+        a[i1] += f * mG[i2]             # update a1 due to m2 (a = f/m)
+        a[i2] -= f * mG[i1]             # update a2 due to m1
+
+    return a
+
+
+def a_old(s):
     """ acceleration at displacement s (vector) """
     k = mu / pow(abs(s), 3)
     a = Vec2( -k * s.x, -k * s.y)
@@ -24,13 +42,25 @@ def main():
     # initialisation
     #  
     t = 0               # initial time
-    v = v0              # initial velocity vector
-    s = s0              # initial displacement vector
+    mG = [
+        10 * G,
+        1 * G
+    ]
+    s = NumList([
+        Vec2(0, 0),
+        Vec2(1, 0)
+    ])
+    v = NumList([
+        Vec2(0, 0),
+        Vec2(0, 4)
+    ])
 
-    # create list of coordinates to be plotted
+    # coordinates to be plotted
     #
-    x_list = []
-    y_list = []
+    x0 = []
+    y0 = []
+    x1 = []
+    y1 = []
 
     # iterate solution
     #
@@ -38,21 +68,23 @@ def main():
 
         # record results
         #
-        x_list.append(s.x)
-        y_list.append(s.y)
+        x0.append(s[0].x)
+        y0.append(s[0].y)
+        x1.append(s[1].x)
+        y1.append(s[1].y)
 
-        # calculate Runge Kutta coefficients for displacement and velocity
+        # calculate RK coefficients for displacement and velocity
         #
-        ks_1 = a(s)
+        ks_1 = a(s, mG)
         kv_1 = v
+      
+        ks_2 = a(s + kv_1 * (dt/2), mG)
+        kv_2 = v + ks_1 * (dt/2)
 
-        ks_2 = a(s + kv_1 * dt/2)
-        kv_2 = v + ks_1 * dt/2
+        ks_3 = a(s + kv_2 * (dt/2), mG)
+        kv_3 = v + ks_2 * (dt/2)
 
-        ks_3 = a(s + kv_2 * dt/2)
-        kv_3 = v + ks_2 * dt/2
-
-        ks_4 = a(s + kv_3 * dt)
+        ks_4 = a(s + kv_3 * dt, mG)
         kv_4 = v + ks_3 * dt
 
         # predict new displacement and velocity
@@ -64,8 +96,9 @@ def main():
     # display results
     #
     fig, ax = plt.subplots(1, 1)
-    ax.set_title('Earth orbit (365 days)')
-    ax.plot(x_list, y_list, label='position')
+    ax.set_title('Simulation')
+    ax.scatter(x0, y0, marker='.')
+    ax.scatter(x1, y1, marker='.')
     ax.set_aspect('equal', 'box')
     ax.grid()
     plt.show()

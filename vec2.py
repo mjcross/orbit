@@ -12,6 +12,21 @@ class Vec2:
 
     def __add__(self, other):
         return Vec2(self.x + other.x, self.y + other.y)
+    
+    def __iadd__(self, other):
+        """In-place addition (+=)"""
+        self.x += other.x
+        self.y += other.y
+        return self
+    
+    def __sub__(self, other):
+        return Vec2(self.x - other.x, self.y - other.y)
+    
+    def __isub__(self, other):
+        """In-place subtraction (-=)"""
+        self.x -= other.x
+        self.y -= other.y
+        return self
 
     def __mul__(self, other):
         return Vec2(other * self.x, other * self.y)

@@ -6,12 +6,19 @@ from itertools import combinations
 
 def a(s, mG):
     """calculate the acceleration of each planet in a system"""   
-    a = NumList(Vec2() for _ in s)      # initialise acceleration vectors to zero
+    a = NumList(Vec2() for _ in s)      # initialise acceleration vectors of planets to zero
+
+    # iterate through each pairwise combination of planets
+    # and accumulate the accelerations
+    #
     for (s1, mG1, a1), (s2, mG2, a2) in combinations(zip(s, mG, a), 2):
-        s12 = s2 - s1
-        f = s12 / pow(abs(s12), 3)      # 1/r^2 in the direction of s12
-        a1 += f * mG2                   # acceleration of 1 due to 2 (f = ma)
-        a2 -= f * mG1                   # acceleration of 2 due to 1
+        # s     position vector
+        # mG    mass * G
+        # a     acceleration vector
+        s12 = s2 - s1                   # displacement vector
+        f = s12 / pow(abs(s12), 3)      # force vector (1/r^2 times the unit vector in the direction of s12)
+        a1 += f * mG2                   # accumulate acceleration vector of 1 due to 2 (f = ma)
+        a2 -= f * mG1                   # accumulate acceleration vector of 2 due to 1
     return a
 
 

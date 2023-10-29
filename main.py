@@ -3,23 +3,24 @@ from vec2 import Vec2
 from numList import NumList
 from itertools import combinations
 
+DEBUG = False
+
 
 def a(s, m):
     """calculate the accelerations of the planets due to gravitational attraction"""
     # gravitational constant
     G = 6.674e-11
 
-    a = NumList(Vec2() for _ in s)      # initialise accumulated acceleration vectors to zero
+    a = NumList(Vec2() for _ in s)          # initialise accumulated acceleration vectors to zero
 
-    # iterate through each pairwise combination of planets
-    # and accumulate the accelerations
+    # iterate through pairs of planets and accumulate the accelerations
     #
     for (s1, m1, a1), (s2, m2, a2) in combinations(zip(s, m, a), 2):
         # s     position vectors
         # m     masses
         # a     acceleration vectors
         s12 = s2 - s1                       # displacement (vector)
-        r = abs(s12)                        # magnitude of displacement
+        r = abs(s12)                        # magnitude of displacement (Vec2 class overloads 'abs()')
         u12 = s12 / r                       # direction of displacement (unit vector)
         f = (G * m1 * m2 / r ** 2) * u12    # force due to gravity (vector)
         a1 += f / m1                        # accumulate acceleration of 1 due to 2 (vector)
@@ -89,11 +90,34 @@ def main():
         ks_4 = a(s + kv_3 * dt, m)
         kv_4 = v + ks_3 * dt
 
-        # predict new displacements and velocities
+
+        # predict changes in position and velocity
+        #
+        dv = (dt/6) * (ks_1 + 2*ks_2 + 2*ks_3 + ks_4)
+        ds = (dt/6) * (kv_1 + 2*kv_2 + 2*kv_3 + kv_4)
+
+
+        if DEBUG:
+            # show intermediate values
+            #
+            print(f"Time:{t}")
+            for i in range(2):
+                print(f"\tplanet: {i}")
+                print(f'\t\tposition {s[i]}')
+                print(f'\t\tvelocity {v[i]}')
+                print(f'\n\t\tks_1     {ks_1[i]}\n\t\tkv_1     {kv_1[i]}')
+                print(f'\n\t\tks_2     {ks_2[i]}\n\t\tkv_2     {kv_2[i]}')
+                print(f'\n\t\tks_3     {ks_3[i]}\n\t\tkv_3     {kv_3[i]}')
+                print(f'\n\t\tks_4     {ks_4[i]}\n\t\tkv_4     {kv_4[i]}')
+                print(f'\n\t\tdv       {dv[i]}')
+                print(f'\t\tds       {ds[i]}')
+                print()
+                  
+        # update positions and velocities
         #
         t += dt
-        v = v + (dt/6) * (ks_1 + 2 * ks_2 + 2 * ks_3 + ks_4)
-        s = s + (dt/6) * (kv_1 + 2 * kv_2 + 2 * kv_3 + kv_4)
+        v = v + dv
+        s = s + ds
     
     # ==================== display results ======================
     #

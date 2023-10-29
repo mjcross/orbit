@@ -4,21 +4,26 @@ from numList import NumList
 from itertools import combinations
 
 
-def a(s, mG):
-    """calculate the acceleration of each planet in a system"""   
-    a = NumList(Vec2() for _ in s)      # initialise acceleration vectors of planets to zero
+def a(s, m):
+    """calculate the accelerations of each planet due to gravitational attraction"""
+    # gravitational constant
+    G = 6.674e-11
+
+    a = NumList(Vec2() for _ in s)      # initialise accumulated acceleration vectors to zero
 
     # iterate through each pairwise combination of planets
     # and accumulate the accelerations
     #
-    for (s1, mG1, a1), (s2, mG2, a2) in combinations(zip(s, mG, a), 2):
-        # s     position vector
-        # mG    mass * G
-        # a     acceleration vector
-        s12 = s2 - s1                   # displacement vector
-        f = s12 / pow(abs(s12), 3)      # force vector (1/r^2 times the unit vector in the direction of s12)
-        a1 += f * mG2                   # accumulate acceleration vector of 1 due to 2 (f = ma)
-        a2 -= f * mG1                   # accumulate acceleration vector of 2 due to 1
+    for (s1, m1, a1), (s2, m2, a2) in combinations(zip(s, m, a), 2):
+        # s     position vectors
+        # m     masses
+        # a     acceleration vectors
+        s12 = s2 - s1                       # displacement (vector)
+        r = abs(s12)                        # magnitude of displacement
+        u12 = s12 / r                       # direction of displacement (unit vector)
+        f = (G * m1 * m2 / r ** 2) * u12    # force due to gravity (vector)
+        a1 += f / m1                        # accumulate acceleration of 1 due to 2 (vector)
+        a2 -= f / m2                        # accumulate acceleration of 2 due to 1 (vector)
     return a
 
 
@@ -30,14 +35,12 @@ def main():
     dt = 60                     # simultion increment (sec)
     t_max = 27.3 * 24 * 60 * 60 # one lunar month is 27.3 days
 
-    # gravitational constant (currently unused)
-    G = 6.674e-11
 
-    # masses (normally these would be multiplied by G)
+    # masses
     #
-    mG = [
-        5.97e24 * G,            # earth mass (kg)
-        7.35e22 * G,            # moon mass (kg)
+    m = [
+        5.97e24,                # earth mass (kg)
+        7.35e22,                # moon mass (kg)
     ]
 
     # initial positions
@@ -74,16 +77,16 @@ def main():
         # calculate RK coefficients for displacement (ks_) and velocity (kv_)
         # (note that all the variables here are lists of vectors)
         #
-        ks_1 = a(s, mG)
+        ks_1 = a(s, m)
         kv_1 = v
       
-        ks_2 = a(s + kv_1 * (dt/2), mG)
+        ks_2 = a(s + kv_1 * (dt/2), m)
         kv_2 = v + ks_1 * (dt/2)
 
-        ks_3 = a(s + kv_2 * (dt/2), mG)
+        ks_3 = a(s + kv_2 * (dt/2), m)
         kv_3 = v + ks_2 * (dt/2)
 
-        ks_4 = a(s + kv_3 * dt, mG)
+        ks_4 = a(s + kv_3 * dt, m)
         kv_4 = v + ks_3 * dt
 
         # predict new displacements and velocities

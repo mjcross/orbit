@@ -20,37 +20,31 @@ def main():
 
     # ==================== initialisation ======================
     #
-    dt = 0.01
-    t_max = 5
+    dt = 60                     # simultion increment (sec)
+    t_max = 27.3 * 24 * 60 * 60 # one lunar month is 27.3 days
 
     # gravitational constant (currently unused)
-    G = 6.67430e-11
+    G = 6.674e-11
 
     # masses (normally these would be multiplied by G)
     #
     mG = [
-        1,
-        1,
-        1,
-        1 
+        5.97e24 * G,            # earth mass (kg)
+        7.35e22 * G,            # moon mass (kg)
     ]
 
     # initial positions
     #
     s = NumList([
-        Vec2( 0,  1),
-        Vec2( 1,  0),
-        Vec2( 0, -1),
-        Vec2(-1,  0)
+        Vec2( 0,  0),
+        Vec2( 3.631e8,  0),     # moon closest approach to earth (m)
     ])
 
     # initial velocities
     #
     v = NumList([
-        Vec2(-0.5,    0),
-        Vec2(   0,  0.5),
-        Vec2( 0.5,    0),
-        Vec2(   0, -0.5)
+        Vec2(0,    0),
+        Vec2(   0,  1082),      # moon maximum orbital velocity (ms-1)    
     ])
 
     # initialise lists of coordinates

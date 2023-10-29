@@ -5,7 +5,7 @@ from itertools import combinations
 
 
 def a(s, m):
-    """calculate the accelerations of each planet due to gravitational attraction"""
+    """calculate the accelerations of the planets due to gravitational attraction"""
     # gravitational constant
     G = 6.674e-11
 
